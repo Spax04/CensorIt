@@ -29,5 +29,5 @@ mongoose
     console.log('Connected to MongoDB')
   })
   .catch(error => {
-    console.log('Faild to connect to MongoDB ' + error.message)
+    console.log('Failed to connect to MongoDB ' + error.message)
   })
