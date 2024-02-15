@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Style for the password label */
+        #password-label {
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        #unlockPassword{
+            margin: 10px;
+            font-size: 14px;
+            padding: 0.5rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="button"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="button"]:hover {
+            background-color: #0056b3;
+        }
+
+        #logout-btn {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Configuration</h2>
+        <label for="blockLevel">Block Level:</label>
+        <select id="blockLevel">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+
+        <input type="button" value="Lock" id="lockBtn">
+        <input type="button" value="Logout" id="logout-btn">
+        <input type="button" value="White list" id="whiteList">
+
+
+        <form id="unlockForm" style="display: none;">
+            <!-- Styled password label -->
+            <label id="password-label" for="unlockPassword">Enter Password:</label>
+            <input type="password" id="unlockPassword" name="unlockPassword" required>
+
+            <input type="button" value="Unlock" id="unlockBtn">
+        </form>
+    </div>
+
+    <script src="../scripts/config.js"></script>
+</body>
+
+</html>
