@@ -10,7 +10,8 @@ export const isAuth = (req: Request, res: Response, next: NextFunction) => {
         if (err) {
           res.status(401).send({ message: 'Invalid Token' })
         } else {
-          req.user = decode
+          // @ts-ignore
+          req.user = decode;
           next()
         }
       })
