@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  let api = 'https://your-api-endpoint.com/whiteList'
+  let api = 'http://localhost:5000/whiteList'
   let token
   let userId
 

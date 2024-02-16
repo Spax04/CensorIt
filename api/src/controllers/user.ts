@@ -3,7 +3,6 @@ import { updateUser } from '../db/users';
 import { ObjectId } from 'bson';
 import { userWithId } from '../models/user';
 
-
 export async function editWhiteCategory(req: Request, res: Response): Promise<any> {
     const id = req.params.id;
     console.log(id);
