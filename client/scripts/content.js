@@ -1,83 +1,83 @@
-const api = 'https://example.com/' //!
+const api = 'http://localhost:5000' //!
 
 function renderBlockPage (description) {
   const newContent = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>CensureIt</title>
-          <style>
-              body {
-                  font-family: Arial, sans-serif;
-                  margin: 0;
-                  padding: 0;
-                  background-color: #f5f5f5;
-              }
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>CensureIt</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f5f5f5;
+                }
+    
+                .container {
+                    max-width: 800px;
+                    margin: 50px auto;
+                    padding: 20px;
+                    background-color: #fff;
+                    border-radius: 8px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                }
+    
+                .content {
+                    margin-top: 20px;
+                }
+    
+                img {
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: 8px;
+                }
+    
+                .about {
+                    background-color: #f9f9f9;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+                }
+    
+                .about h2 {
+                    color: #333;
+                    font-size: 24px;
+                    margin-bottom: 10px;
+                }
+    
+                .about p {
+                    color: #666;
+                    font-size: 16px;
+                    line-height: 1.6;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>This page was blocked!</h1>
+                <img src="https://www.pngall.com/wp-content/uploads/13/Censored-PNG.png" alt="Placeholder Image">
+                <div class="content">
+                    <div class="about">
+                        <h2>Why this page was blocked?</h2>
+                        <p> ${description}</p>
+                    </div>
+                </div>
+            </div>
   
-              .container {
-                  max-width: 800px;
-                  margin: 50px auto;
-                  padding: 20px;
-                  background-color: #fff;
-                  border-radius: 8px;
-                  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-              }
   
-              .content {
-                  margin-top: 20px;
-              }
-  
-              img {
-                  max-width: 100%;
-                  height: auto;
-                  border-radius: 8px;
-              }
-  
-              .about {
-                  background-color: #f9f9f9;
-                  padding: 20px;
-                  border-radius: 8px;
-                  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-              }
-  
-              .about h2 {
-                  color: #333;
-                  font-size: 24px;
-                  margin-bottom: 10px;
-              }
-  
-              .about p {
-                  color: #666;
-                  font-size: 16px;
-                  line-height: 1.6;
-              }
-          </style>
-      </head>
-      <body>
-          <div class="container">
-              <h1>This page was blocked!</h1>
-              <img src="https://www.pngall.com/wp-content/uploads/13/Censored-PNG.png" alt="Placeholder Image">
-              <div class="content">
-                  <div class="about">
-                      <h2>Why this page was blocked?</h2>
-                      <p> ${description}</p>
-                  </div>
-              </div>
-          </div>
-
-
-      </body>
-      </html>
-    `
+        </body>
+        </html>
+      `
 
   // Replace the content of the entire page with newContent
   document.documentElement.innerHTML = newContent
 }
 
 // Extention starter function
-function onLoaded () {
+async function onLoaded  () {
   let currentUrl = window.location.toString()
   let userData
   // Create a URL object
@@ -88,29 +88,45 @@ function onLoaded () {
   // renderBlockPage(`${baseUrl}`)
   try {
     userData = getUserCredentials()
-    checkURL(baseUrl, userData, censureWebPage)
-  } catch {}
-}
-
-// Getting user's Id and Token
-const getUserCredentials = () => {
-  let token
-  let userId
-  try {
-    chrome.storage.local.get(['token']).then(result => {
-      token = result
-    })
-    chrome.storage.local.get(['userId']).then(result => {
-      userId = result
-    })
-    return { token, userId }
-  } catch {
-    alert('User Unauthorized')
+    await checkURL(baseUrl, userData)
+  } catch (err) {
+    alert(err)
   }
 }
 
+// Getting user's Id and Token
+const getUserCredentials = async () => {
+  const tokenPromise = new Promise((resolve, reject) => {
+    chrome.storage.local.get(['token'], result => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError)
+      } else {
+        resolve(result.token)
+      }
+    })
+  })
+
+  const userIdPromise = new Promise((resolve, reject) => {
+    chrome.storage.local.get(['userId'], result => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError)
+      } else {
+        resolve(result.userId)
+      }
+    })
+  })
+
+  const token = await tokenPromise
+  const userId = await userIdPromise
+
+  if (token === undefined || userId === undefined) {
+    throw new Error('Unauthorized')
+  }
+  return { token, userId }
+}
+
 // Checking if URL exist in database,returns block page if webpage exist and not match to users configuration
-async function checkURL (baseUrl, { userId, token }, callback) {
+async function checkURL (baseUrl, { userId, token }) {
   const data = {
     link: baseUrl,
     userId: userId
@@ -125,20 +141,21 @@ async function checkURL (baseUrl, { userId, token }, callback) {
     body: JSON.stringify(data)
   }
 
-  await fetch(`${api}/scan/link`, options)
-    .then(response => {
+  await fetch(`${api}/scanning/link`, options)
+    .then(async response => {
       if (response.ok) {
-        return response.json()
+        return await response.json()
       } else {
         alert('Error: ' + response.statusText)
       }
     })
-    .then(data => {
-      if (!data.isExist) {
-        callback(userId, token)
-      } else if (!data.isAllowed) {
-        renderBlockPage(data.description)
-      }
+    .then(async data => {
+      alert(data.message)
+      // if (!data.isExist) {
+      await censureWebPage(userId, token)
+      // } else if (!data.isAllowed) {
+      //   renderBlockPage(data.description)
+      // }
     })
     .catch(error => {
       // Handle errors
@@ -149,6 +166,8 @@ async function checkURL (baseUrl, { userId, token }, callback) {
 
 // Censuring currend DOM,replacing dyrtes words to "****"
 async function censureWebPage (userId, token) {
+
+  const htmlContent = document.documentElement.outerHTML;
 
   const data = {
     webPage: htmlContent,
@@ -164,7 +183,7 @@ async function censureWebPage (userId, token) {
     body: JSON.stringify(data)
   }
 
-  await fetch(`${api}/scan/text`, options)
+  await fetch(`${api}/scanning/text`, options)
     .then(response => {
       if (response.ok) {
         return response.json()
@@ -173,11 +192,12 @@ async function censureWebPage (userId, token) {
       }
     })
     .then(data => {
-      if (!data.isAllowed) {
-        renderBlockPage(data.description)
-      } else {
-        document.documentElement.innerHTML = data.censuredWebPage
-      }
+      alert(data.message)
+      // if (!data.isAllowed) {
+      //   renderBlockPage(data.description)
+      // } else {
+      //   document.documentElement.innerHTML = data.censuredWebPage
+      // }
     })
     .catch(error => {
       console.error('Error:', error.message)
@@ -185,4 +205,5 @@ async function censureWebPage (userId, token) {
 }
 
 //* Extention starts here
+
 onLoaded()
