@@ -11,6 +11,10 @@
     "experimentalDecorators": true,
     "sourceMap": true
   },
+  "include": [
+    "src/**/*.ts",
+
+  ],
   "ts-node": {
     "esm": true
   }
