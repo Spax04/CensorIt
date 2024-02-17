@@ -5,10 +5,13 @@ import mongoose from 'mongoose';
 import ScanningRouter from './routes/scanning';
 import userRouter from './routes/user';
 import authRouter from './routes/auth';
+import session from 'express-session';
+
 
 dotenv.config();
 const PORT = process.env.PORT || 5000
 const app = express();
+
 
 app.use(cors())
 app.use(express.json()) // pars request to JSON

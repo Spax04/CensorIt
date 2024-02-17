@@ -165,43 +165,49 @@ async function checkURL (baseUrl, { userId, token }) {
 }
 
 // Censuring currend DOM,replacing dyrtes words to "****"
-async function censureWebPage (userId, token) {
-
+function censureWebPage(userId, token) {
   const htmlContent = document.documentElement.outerHTML;
-
-  const data = {
-    webPage: htmlContent,
-    userId: userId
+  const chunkSize = 10000; // Adjust the chunk size as needed
+  const chunks = [];
+  
+  for (let i = 0; i < htmlContent.length; i += chunkSize) {
+    chunks.push(htmlContent.slice(i, i + chunkSize));
   }
 
-  const options = {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  }
+  Promise.all(chunks.map((chunk, index) => {
+    const data = {
+      webPageChunk: chunk,
+      userId: userId,
+      totalChunks: chunks.length,
+      currentChunkIndex: index
+    };
 
-  await fetch(`${api}/scanning/text`, options)
-    .then(response => {
-      if (response.ok) {
-        return response.json()
-      } else {
-        alert('Error: ' + response.statusText)
-      }
-    })
-    .then(data => {
-      alert(data.message)
-      // if (!data.isAllowed) {
-      //   renderBlockPage(data.description)
-      // } else {
-      //   document.documentElement.innerHTML = data.censuredWebPage
-      // }
-    })
-    .catch(error => {
-      console.error('Error:', error.message)
-    })
+    const options = {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    };
+
+    return fetch(`${api}/scanning/text`, options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        return response.json();
+      });
+  }))
+  .then(responses => {
+    const modifiedWebPage = responses[responses.length - 1].modifiedWebPage;
+    alert('Modified Webpage:\n\n' + modifiedWebPage);
+    document.documentElement.innerHTML = modifiedWebPage
+  })
+  .catch(error => {
+    console.error('Error:', error.message);
+    alert('An error occurred while sending the webpage to the API.');
+  });
 }
 
 //* Extention starts here
