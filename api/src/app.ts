@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import ScanningRouter from './routes/scanning';
 import userRouter from './routes/user';
 import authRouter from './routes/auth';
-import session from 'express-session';
 
 
 dotenv.config();
