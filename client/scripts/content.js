@@ -1,3 +1,4 @@
+
 const api = 'http://localhost:5000' //!
 
 function renderBlockPage (description) {
@@ -202,6 +203,7 @@ function censureWebPage(userId, token) {
   .then(responses => {
     const modifiedWebPage = responses[responses.length - 1].modifiedWebPage;
     alert('Modified Webpage:\n\n' + modifiedWebPage);
+    console.log(modifiedWebPage);
     document.documentElement.innerHTML = modifiedWebPage
   })
   .catch(error => {
