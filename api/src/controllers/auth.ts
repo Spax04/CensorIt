@@ -21,7 +21,7 @@ export async function signUp(req: Request, res: Response): Promise<any> {
     const user = await newUser.save();
 
     res.send({
-      _id: user._id,
+      userId: user._id,
       email: user.email,
       token: generateToken(user),
     });
