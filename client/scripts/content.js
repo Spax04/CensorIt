@@ -152,11 +152,10 @@ async function checkURL (baseUrl, { userId, token }) {
     })
     .then(async data => {
       // if (!data.isExist) {
-        setTimeout(async () => {
+       
           alert('This page is not in the database')
           await censureWebPage(userId, token)
-        }
-        , 5000)
+
       // } else if (!data.isAllowed) {
       //   renderBlockPage(data.description)
       // }
@@ -169,16 +168,15 @@ async function checkURL (baseUrl, { userId, token }) {
 }
 
 // Censuring currend DOM,replacing dyrtes words to "****"
-function censureWebPage(userId, token) {
+async function censureWebPage(userId, token) {
   const htmlContent = document.documentElement.outerHTML;
   const chunkSize = 10000; // Adjust the chunk size as needed
-  const chunks = [];
-  
+  const chunks = [];  
   for (let i = 0; i < htmlContent.length; i += chunkSize) {
     chunks.push(htmlContent.slice(i, i + chunkSize));
   }
 
-  Promise.all(chunks.map((chunk, index) => {
+ await Promise.all(chunks.map((chunk, index) => {
     const data = {
       webPageChunk: chunk,
       userId: userId,
@@ -205,7 +203,7 @@ function censureWebPage(userId, token) {
   }))
   .then(responses => {
     const modifiedWebPage = responses[responses.length - 1].modifiedWebPage;
-    console.log(modifiedWebPage);
+    alert(modifiedWebPage)
     document.documentElement.innerHTML = modifiedWebPage
   })
   .catch(error => {
