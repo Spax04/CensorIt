@@ -12,10 +12,14 @@
             padding: 20px;
         }
 
+        .lists{
+            display: flex;
+            justify-content: space-around;
+        }
         .container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-column-gap: 20px;
+          
+            /* grid-template-columns: repeat(3, 1fr);
+            grid-column-gap: 20px; */
             max-width: 1000px;
             margin: 0 auto;
             background-color: #fff;
@@ -63,38 +67,61 @@
             list-style-type: none;
             padding: 0;
             margin: 0;
+            height: 300px;
         }
 
         ul li {
             margin-bottom: 5px;
+            
+        }
+
+        #myHeader{
+            text-align: center;
+        }
+
+        .removeWordBtn{
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .removeLinkBtn{
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+            margin-right: 10px;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        
-        <div class="column">
-            <h2>Links</h2>
-            <label for="linkInput">Links:</label>
-            <input type="text" id="linkInput" placeholder="Enter links here">
-            <input type="button" value="Add Link" id="addLinkBtn">
+        <h1 id="myHeader">White list settings</h1>
+        <div class="lists">
 
-            <ul id="linksList"></ul>
-            <input type="button" value="Save Links" id="saveLinksBtn">
+            <div class="column">
+                <h2>Links</h2>
+                <label for="linkInput">Links:</label>
+                <input type="text" id="linkInput" placeholder="Enter links here">
+                <input type="button" value="Add Link" id="addLinkBtn">
+    
+                <ul id="linksList"></ul>
+                <input type="button" value="Save Links" id="saveLinksBtn">
+            </div>
+    
+            <div class="column">
+                <h2>Words</h2>
+                <label for="wordInput">Words:</label>
+                <input type="text" id="wordInput" placeholder="Enter words here">
+                <input type="button" value="Add Word" id="addWordsBtn">
+    
+                <ul id="wordsList"></ul>
+                <input type="button" value="Save Words" id="saveWordsBtn">
+            </div>
         </div>
 
-        <div class="column">
-            <h2>Words</h2>
-            <label for="wordInput">Words:</label>
-            <input type="text" id="wordInput" placeholder="Enter words here">
-            <input type="button" value="Add Word" id="addWordsBtn">
-
-            <ul id="wordsList"></ul>
-            <input type="button" value="Save Words" id="saveWordsBtn">
-        </div>
-
-        <div class="column">
+        <!-- <div class="column">
             <h2>Category</h2>
             <label for="categorySelect">Category:</label>
             <select id="categorySelect">
@@ -106,7 +133,7 @@
 
             <ul id="categoryItemsList"></ul>
             <input type="button" value="Save Category" id="saveCategoryBtn">
-        </div>
+        </div> -->
     </div>
 
     <script src="../scripts/settings.js"></script>
