@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Session, SessionData } from 'express-session';
+import modifyWebPage from '../utils/modifyWebPage';
 export async function scanLink(req: Request, res: Response): Promise<any> {
   // TODO: Implement a proper link scanner.
 
@@ -37,8 +38,16 @@ export async function scanText(req: Request, res: Response): Promise<void> {
       // Clear the stored chunks
       userChunksMap.delete(userId);
 
+
+      // regex to match the content only to the body
+      // const bodyReg = /<body[^>]*>((.|[\n\r])*)<\/body>/im;
+
+      // let bodyWebPage = completeWebPage.match(bodyReg)![0];
+
       // Do something with the complete HTML content (e.g., modify the webpage)
-      const modifiedWebPage = modifyWebPage(completeWebPage);
+      // const modifiedWebPage = completeWebPage.replace(bodyWebPage, await modifyWebPage(bodyWebPage)) ;
+
+      const modifiedWebPage = await modifyWebPage(completeWebPage);
 
       // Return the modified HTML page to the client
       res.send({ modifiedWebPage });
@@ -50,12 +59,4 @@ export async function scanText(req: Request, res: Response): Promise<void> {
     console.error('Error processing request:', error);
     res.status(500).send({ error: 'Internal server error' });
   }
-}
-
-function modifyWebPage(webPage: string): string {
-  // Find the <title> tag and replace its content with "MODIFIED"
-  const modifiedTitle = webPage.replace(/<title[^>]*>.*?<\/title>/i, '<title>MODIFIED</title>');
-  
-  // Return the modified HTML content
-  return modifiedTitle;
 }

@@ -151,9 +151,12 @@ async function checkURL (baseUrl, { userId, token }) {
       }
     })
     .then(async data => {
-      alert(data.message)
       // if (!data.isExist) {
-      await censureWebPage(userId, token)
+        setTimeout(async () => {
+          alert('This page is not in the database')
+          await censureWebPage(userId, token)
+        }
+        , 5000)
       // } else if (!data.isAllowed) {
       //   renderBlockPage(data.description)
       // }
@@ -202,7 +205,6 @@ function censureWebPage(userId, token) {
   }))
   .then(responses => {
     const modifiedWebPage = responses[responses.length - 1].modifiedWebPage;
-    alert('Modified Webpage:\n\n' + modifiedWebPage);
     console.log(modifiedWebPage);
     document.documentElement.innerHTML = modifiedWebPage
   })
@@ -212,6 +214,5 @@ function censureWebPage(userId, token) {
   });
 }
 
-//* Extention starts here
 
 onLoaded()
