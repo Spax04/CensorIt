@@ -152,7 +152,6 @@ async function checkURL (baseUrl, { userId, token }) {
     })
     .then(async data => {
       // if (!data.isExist) {
-       
           alert('This page is not in the database')
           await censureWebPage(userId, token)
 
@@ -202,8 +201,7 @@ async function censureWebPage(userId, token) {
       });
   }))
   .then(responses => {
-    const modifiedWebPage = responses[responses.length - 1].modifiedWebPage;
-    alert(modifiedWebPage)
+    const modifiedWebPage = responses[responses.length - 1].modifiedPage;
     document.documentElement.innerHTML = modifiedWebPage
   })
   .catch(error => {
