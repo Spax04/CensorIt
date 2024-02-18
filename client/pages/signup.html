@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Sign Up</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,7 +13,7 @@
         }
 
         .container {
-            max-width: 300px;
+            width: 150px;
             /* Reduced width */
             margin: 0 auto;
             background-color: #fff;
@@ -34,6 +34,7 @@
         }
 
         input[type="text"],
+        input[type="email"],
         input[type="password"] {
             width: 100%;
             /* Full width */
@@ -64,8 +65,7 @@
             /* Center align the error message */
         }
 
-        #loginForm {
-            width: 150px;
+        #signupForm {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -75,20 +75,23 @@
 
 <body>
     <div class="container">
-        <h2>Login</h2>
-        <form id="loginForm">
-            <label for="username">Email:</label>
-            <input type="text" id="username" name="username" required>
+        <h2>Sign Up</h2>
+        <form id="signupForm">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
 
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
 
-            <input type="submit" value="Login">
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+
+            <input type="submit" value="Sign Up">
         </form>
         <div class="error-message" id="errorMessage"></div>
     </div>
-    <a href="./signup.html">Don't have an account?</a>
-    <script src="../scripts/login.js"></script>
+    <a href="./login.html">Already have an account? Login</a>
+    <script src="../scripts/signup.js"></script>
 </body>
 
 </html>

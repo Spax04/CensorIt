@@ -1,29 +1,62 @@
-import {Request ,Response} from 'express';
-import { website, websiteModel } from '../models/website'; 
+import { Request, Response } from 'express';
+import { Session, SessionData } from 'express-session';
+import modifyWebPage from '../utils/modifyWebPage';
 export async function scanLink(req: Request, res: Response): Promise<any> {
-    // TODO: Implement a proper link scanner.
-    try {
+  // TODO: Implement a proper link scanner.
 
-        const inputLink: website["link"] = req.body.link;
-        const web: website | null = await websiteModel.findOne({ link: inputLink})
-        
-        if (web) {
-            if (web.blockPercentage === 0) {
-                res.send({ message: "allowed website"})
-            } else {
-                res.send({ blockPrecentage: web.blockPercentage });
-            }
-        } else {
-            res.send({message: 'new link'})
-        }
-    } catch (error) {
-        console.error("Error in scan link", error);
-        res
-          .status(500)
-          .send({ message: "Internal server error", error: error.message });
-    }
+  const { userId, link } = req.body;
+
+  //! TEST
+  console.log(req.body);
+
+  return res.send({ message: 'Scanning Link' });
 }
 
-export async function scanText(req: Request, res: Response): Promise<any> {
-    // TODO: Implement a proper text scanner.
+
+
+// Your scanText function
+const userChunksMap: Map<string, string[]> = new Map();
+
+export async function scanText(req: Request, res: Response): Promise<void> {
+  try {
+    // Retrieve data from request body
+    const { webPageChunk, userId, totalChunks, currentChunkIndex } = req.body;
+
+    // Initialize an array to store chunks for the user if it doesn't exist
+    if (!userChunksMap.has(userId)) {
+      userChunksMap.set(userId, []);
+    }
+
+    // Store the received chunk
+    userChunksMap.get(userId)![currentChunkIndex] = webPageChunk;
+
+    // Check if all chunks have been received
+    if (userChunksMap.get(userId)!.length === totalChunks) {
+      // Reconstruct the complete HTML page
+      const completeWebPage = userChunksMap.get(userId)!.join('');
+
+      // Clear the stored chunks
+      userChunksMap.delete(userId);
+
+
+      // regex to match the content only to the body
+      // const bodyReg = /<body[^>]*>((.|[\n\r])*)<\/body>/im;
+
+      // let bodyWebPage = completeWebPage.match(bodyReg)![0];
+
+      // Do something with the complete HTML content (e.g., modify the webpage)
+      // const modifiedWebPage = completeWebPage.replace(bodyWebPage, await modifyWebPage(bodyWebPage)) ;
+
+      const modifiedWebPage = await modifyWebPage(completeWebPage);
+
+      // Return the modified HTML page to the client
+      res.send({ modifiedWebPage });
+    } else {
+      // Respond with success message indicating chunk received
+      res.send({ message: `Chunk ${currentChunkIndex + 1} of ${totalChunks} received.` });
+    }
+  } catch (error) {
+    console.error('Error processing request:', error);
+    res.status(500).send({ error: 'Internal server error' });
+  }
 }

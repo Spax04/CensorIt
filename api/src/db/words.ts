@@ -33,6 +33,21 @@ const getWord = (id: mongoose.Types.ObjectId) => {
     });
 };
 
+const getAllWords = () => {
+    return new Promise<wordWithId[]>(async (resolve, reject) => {
+        mongoose.connect(process.env.MONGO_URL as string).then(async () => {
+            if (!wordModel.collection) {
+                wordModel.createCollection();
+                reject("collection not found");
+            }
+            const foundWords = await wordModel.find().exec().catch((error) => {
+                reject(error);
+            });
+            resolve(foundWords as wordWithId[]);
+        });
+    });
+}
+
 const updateWord = (id: mongoose.Types.ObjectId, updatedWordData: Partial<word>) => {
     return new Promise<wordWithId>((resolve, reject) => {
         mongoose.connect(process.env.MONGO_URL as string).then(async () => {
@@ -64,4 +79,4 @@ const deleteWord = (id: mongoose.Types.ObjectId) => {
     });
 };
 
-export { createWord, getWord, updateWord, deleteWord };
+export { createWord, getWord, getAllWords, updateWord, deleteWord };
