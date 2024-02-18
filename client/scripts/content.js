@@ -151,15 +151,7 @@ async function checkURL (baseUrl, { userId, token }) {
       }
     })
     .then(async data => {
-      // if (!data.isExist) {
-        setTimeout(async () => {
-          alert('This page is not in the database')
           await censureWebPage(userId, token)
-        }
-        , 5000)
-      // } else if (!data.isAllowed) {
-      //   renderBlockPage(data.description)
-      // }
     })
     .catch(error => {
       // Handle errors
@@ -169,7 +161,7 @@ async function checkURL (baseUrl, { userId, token }) {
 }
 
 // Censuring currend DOM,replacing dyrtes words to "****"
-function censureWebPage(userId, token) {
+async function censureWebPage(userId, token) {
   const htmlContent = document.documentElement.outerHTML;
   const chunkSize = 10000; // Adjust the chunk size as needed
   const chunks = [];
@@ -204,7 +196,8 @@ function censureWebPage(userId, token) {
       });
   }))
   .then(responses => {
-    const modifiedWebPage = responses[responses.length - 1].modifiedWebPage;
+    // console.log(JSON.stringify(responses))
+    const modifiedWebPage = responses[responses.length - 1].modifiedPage;
     console.log(modifiedWebPage);
     document.documentElement.innerHTML = modifiedWebPage
   })
