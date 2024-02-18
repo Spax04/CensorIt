@@ -1,5 +1,5 @@
 import express, {Request, Response} from "express";
-import { editPersonalBlockPercentage, editWhiteCategory, editWhiteWebsite, editWhiteWord } from "../controllers/user";
+import { editPersonalBlockPercentage, getUserLists,editWhiteCategory, editWhiteWebsite, editWhiteWord } from "../controllers/user";
 
 const userRouter = express.Router();
 
@@ -18,6 +18,10 @@ userRouter.put("/:id/white-word", (req: Request, res: Response) => {
 
 userRouter.put("/:id/personal-block-percentage", (req: Request, res: Response) => {
     return editPersonalBlockPercentage(req, res);
+})
+
+userRouter.get("/:id/white-lists", (req: Request, res: Response) => {
+    return getUserLists(req, res);
 })
 
 
