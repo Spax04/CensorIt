@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
           let userId = data.userId
           chrome.storage.local.set({ "token": token });
           chrome.storage.local.set({ "userId": userId });
-  
+  alert(userId)
           window.location.href = "../pages/config.html";
       })
       .catch(error => {

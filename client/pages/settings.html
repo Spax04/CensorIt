@@ -13,7 +13,10 @@
         }
 
         .container {
-            max-width: 400px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-column-gap: 20px;
+            max-width: 1000px;
             margin: 0 auto;
             background-color: #fff;
             border-radius: 8px;
@@ -21,13 +24,17 @@
             padding: 20px;
         }
 
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
         h2 {
             text-align: center;
         }
 
         label {
-            display: block;
-            margin-bottom: 5px;
             font-size: 1rem;
         }
 
@@ -35,50 +42,71 @@
         select {
             width: 100%;
             padding: 8px;
-            margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
 
         input[type="button"] {
-            width: 100%;
             padding: 10px;
             background-color: #007bff;
             color: #fff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            margin-bottom: 20px;
         }
 
         input[type="button"]:hover {
             background-color: #0056b3;
+        }
 
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            margin-bottom: 5px;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h2>Settings</h2>
-        <label for="linkInput">Links:</label>
-        <input type="text" id="linkInput" placeholder="Enter links here">
+        
+        <div class="column">
+            <h2>Links</h2>
+            <label for="linkInput">Links:</label>
+            <input type="text" id="linkInput" placeholder="Enter links here">
+            <input type="button" value="Add Link" id="addLinkBtn">
 
-        <input type="button" value="Save Links" id="saveLinksBtn">
+            <ul id="linksList"></ul>
+            <input type="button" value="Save Links" id="saveLinksBtn">
+        </div>
 
-        <label for="wordInput">Words:</label>
-        <input type="text" id="wordInput" placeholder="Enter words here">
+        <div class="column">
+            <h2>Words</h2>
+            <label for="wordInput">Words:</label>
+            <input type="text" id="wordInput" placeholder="Enter words here">
+            <input type="button" value="Add Word" id="addWordsBtn">
 
-        <input type="button" value="Save Words" id="saveWordsBtn">
+            <ul id="wordsList"></ul>
+            <input type="button" value="Save Words" id="saveWordsBtn">
+        </div>
 
-        <label for="categorySelect">Category:</label>
-        <select id="categorySelect">
-            <option value="65cdcc2316ad1f411aa12a4d">Pornography</option>
-            <option value="65cdcc2116ad1f411aa1272d">Violence</option>
-            <option value="65cdcc2116ad1f411aa1272e">Insult</option>
-        </select>
+        <div class="column">
+            <h2>Category</h2>
+            <label for="categorySelect">Category:</label>
+            <select id="categorySelect">
+                <option value="65cdcc2316ad1f411aa12a4d">Pornography</option>
+                <option value="65cdcc2116ad1f411aa1272d">Violence</option>
+                <option value="65cdcc2116ad1f411aa1272e">Insult</option>
+            </select>
+            <input type="button" value="Add Category" id="addCategoryBtn">
 
-        <input type="button" value="Save Category" id="saveCategoryBtn">
+            <ul id="categoryItemsList"></ul>
+            <input type="button" value="Save Category" id="saveCategoryBtn">
+        </div>
     </div>
 
     <script src="../scripts/settings.js"></script>

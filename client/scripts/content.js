@@ -151,7 +151,13 @@ async function checkURL (baseUrl, { userId, token }) {
       }
     })
     .then(async data => {
+      // if (!data.isExist) {
+          alert('This page is not in the database')
           await censureWebPage(userId, token)
+
+      // } else if (!data.isAllowed) {
+      //   renderBlockPage(data.description)
+      // }
     })
     .catch(error => {
       // Handle errors
@@ -164,13 +170,12 @@ async function checkURL (baseUrl, { userId, token }) {
 async function censureWebPage(userId, token) {
   const htmlContent = document.documentElement.outerHTML;
   const chunkSize = 10000; // Adjust the chunk size as needed
-  const chunks = [];
-  
+  const chunks = [];  
   for (let i = 0; i < htmlContent.length; i += chunkSize) {
     chunks.push(htmlContent.slice(i, i + chunkSize));
   }
 
-  Promise.all(chunks.map((chunk, index) => {
+ await Promise.all(chunks.map((chunk, index) => {
     const data = {
       webPageChunk: chunk,
       userId: userId,
@@ -196,9 +201,7 @@ async function censureWebPage(userId, token) {
       });
   }))
   .then(responses => {
-    // console.log(JSON.stringify(responses))
     const modifiedWebPage = responses[responses.length - 1].modifiedPage;
-    console.log(modifiedWebPage);
     document.documentElement.innerHTML = modifiedWebPage
   })
   .catch(error => {
