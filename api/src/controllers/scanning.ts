@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
-import { Session, SessionData } from 'express-session';
 import modifyWebPage from '../utils/modifyWebPage';
+import classifyCategory from '../utils/classifyCategory';
+
+
 export async function scanLink(req: Request, res: Response): Promise<any> {
   // TODO: Implement a proper link scanner.
 
@@ -27,8 +29,14 @@ export async function scanText(req: Request, res: Response): Promise<void> {
     if (userChunksMap.get(userId)!.length === totalChunks) {
       const completeWebPage = userChunksMap.get(userId)!.join('');
       userChunksMap.delete(userId);
-      const modifiedWebPage = await modifyWebPage(completeWebPage);
-      res.send({ modifiedWebPage });
+      const modifiedWebPage = modifyWebPage(completeWebPage);
+      const amountOfWords = completeWebPage.split(' ').length;
+      const { modifiedPage, wordsAmount } = await modifiedWebPage;
+
+      let x = classifyCategory(wordsAmount, amountOfWords)
+
+
+      res.send({ modifiedPage });
     } else {
       res.send({ message: `Chunk ${currentChunkIndex + 1} of ${totalChunks} received.` });
     }
@@ -37,3 +45,4 @@ export async function scanText(req: Request, res: Response): Promise<void> {
     res.status(500).send({ error: 'Internal server error' });
   }
 }
+
