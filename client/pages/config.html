@@ -68,24 +68,33 @@
 
         #logout-btn {
             margin-top: 20px;
-            margin-bottom: 20px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        #whiteList{
+            margin-top: 20px;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h2>Configuration</h2>
+        <img src="../images/icon-128.png"/>
+        <h2>CensurIt</h2>
+
         <label for="blockLevel">Block Level:</label>
         <select id="blockLevel">
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
+            <option value="25">Low</option>
+            <option value="50">Medium</option>
+            <option value="75">High</option>
         </select>
 
         <input type="button" value="Lock" id="lockBtn">
-        <input type="button" value="Logout" id="logout-btn">
+        <!-- <input type="button" value="Logout"  id="logout-btn"> -->
         <input type="button" value="White list" id="whiteList">
+        <img id="logout-btn" src="../images//logout.png"/>
+        <!-- <a href="https://www.flaticon.com/free-icons/logout" id="logout-btn" title="logout icons"> Logout</a> -->
 
 
         <form id="unlockForm" style="display: none;">

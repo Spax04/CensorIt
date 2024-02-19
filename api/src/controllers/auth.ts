@@ -23,6 +23,7 @@ export async function signUp(req: Request, res: Response): Promise<any> {
     res.send({
       userId: user._id,
       email: user.email,
+      personalBlockPercentage: user.personalBlockPercentage,
       token: generateToken(user),
     });
   } catch (err) {
@@ -42,6 +43,7 @@ export async function signIn(req: Request, res: Response): Promise<any> {
         res.send({
           userId: user._id,
           email: user.email,
+          personalBlockPercentage: user.personalBlockPercentage,
           token: generateToken(user),
         });
         return;

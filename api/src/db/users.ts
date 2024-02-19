@@ -33,20 +33,21 @@ const getUser = (id: mongoose.Types.ObjectId) => {
 
 const updateUser = (id: mongoose.Types.ObjectId, updatedUserData: Partial<user>) => {
     return new Promise<userWithId>((resolve, reject) => {
-        mongoose.connect(process.env.MONGO_URL as string).then(async () => {
-            if (!userModel.collection) {
-                userModel.createCollection();
-                reject("collection not found");
-            }
-            const updatedUser = await userModel.findByIdAndUpdate(id, updatedUserData).exec().catch(err => {
-                if (err || !updatedUser) {
-                    reject(err ?? "user not found");
-                }
-                resolve(updatedUser as userWithId);
-            })
-        });
-    })
-};
+      mongoose.connect(process.env.MONGO_URL as string).then(async () => {
+        try {
+          const updatedUser = await userModel.findByIdAndUpdate(id, updatedUserData, { new: true });
+          if (!updatedUser) {
+            reject("User not found");
+          }
+          resolve(updatedUser as userWithId);
+        } catch (err) {
+          reject(err);
+        }
+      }).catch(err => {
+        reject(err);
+      });
+    });
+  };
 
 const deleteUser = (id: mongoose.Types.ObjectId) => {
     return new Promise<void>(async (resolve, reject) => {

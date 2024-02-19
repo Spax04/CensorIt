@@ -2,12 +2,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const api = 'http://localhost:5000'
   let token
   let userId
+  let personalBlockPercentage
   chrome.storage.local.get(['token']).then(result => {
     token = result.token
   })
   chrome.storage.local.get(['userId']).then(result => {
     userId = result.userId
   })
+  chrome.storage.local.get(['personalBlockPercentage']).then(result => {
+    personalBlockPercentage = result.personalBlockPercentage
+    setBlockLevelOption(personalBlockPercentage)
+  })
+
+  const setBlockLevelOption = (personalBlockProsent) => {
+    const blockLevelSelect = document.getElementById('blockLevel');
+    blockLevelSelect.value = personalBlockProsent.toString();
+  };
+
 
   document.getElementById('lockBtn').addEventListener('click', function () {
     let unlockForm = document.getElementById('unlockForm')
@@ -28,6 +39,37 @@ document.addEventListener('DOMContentLoaded', () => {
       this.value = 'Lock'
     }
   })
+
+  // Function to send the fetch request to update block level
+  const updateBlockLevel = async (newPercentage) => {
+
+    try {
+      const response = await fetch(`${api}/user/${userId}/personal-block-percentage`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ newPercentage })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update block level');
+      }
+
+      alert('Block level updated successfully');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to update block level. Please try again.');
+    }
+  };
+
+  document.getElementById('blockLevel').addEventListener('change', function () {
+    const newPercentage = this.value;
+    
+    updateBlockLevel(newPercentage);
+  });
+
 
   document.getElementById('unlockBtn').addEventListener('click',async function () {
     let unlockPassword = document.getElementById('unlockPassword').value

@@ -6,32 +6,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   let wordList = [] // Array to store added words
   let categoryList = [] // Array to store added categories
 
-  await getUserCredentials();
+  await getUserCredentials()
 
   await getUserWhiteLists()
 
-  
   document.getElementById('addLinkBtn').addEventListener('click', () => {
-    let linkInput = document.getElementById('linkInput');
-    let link = linkInput.value;
-    websiteList.push(link);
+    let linkInput = document.getElementById('linkInput')
+    let link = { link: linkInput.value }
+    websiteList.push(link)
 
+    linkInput.value = ''
 
-    populateWebsiteList(websiteList);
-});
+    populateWebsiteList(websiteList)
+  })
 
   document.getElementById('addWordsBtn').addEventListener('click', () => {
-    let word = document.getElementById('wordInput').value
-    wordList.push(word)
+    let word = document.getElementById('wordInput')
+    let newWord = { content: word.value }
+    wordList.push(newWord)
+    word.value = ''
 
     populateWordList(wordList)
   })
-  document.getElementById('addCategoryBtn').addEventListener('click', () => {
-    let category = document.getElementById('categoryInput').value
-    categoryList.push(category)
+  // document.getElementById('addCategoryBtn').addEventListener('click', () => {
+  //   let category = document.getElementById('categoryInput')
+  //   let newCategory = {name:category.value}
+  //   categoryList.push(newCategory)
 
-    populateCategoryList(categoryList)
-  })
+  //   populateCategoryList(categoryList)
+  // })
 
   document
     .getElementById('saveLinksBtn')
@@ -72,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       let sendingData = {
         newWordList: wordList
       }
+      alert(wordList)
       await fetch(`${api}/user/${userId}/white-word`, {
         method: 'PUT',
         headers: {
@@ -99,42 +103,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         })
     })
 
-  document
-    .getElementById('saveCategoryBtn')
-    .addEventListener('click', async () => {
-      let sendingData = {
-        newCategoryList: categoryList
-      }
-      await fetch(`${api}/user/${userId}/white-category`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(sendingData)
-      })
-        .then(response => {
-          if (!response.ok) {
-            alert('Some error')
-          }
-          return response.json()
-        })
-        .then(data => {
-          if (data.isSucceed) {
-            alert('Category was successful added to white list')
-          } else {
-            alert('Try again')
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error)
-          alert(error.message)
-        })
-    })
+  // document
+  //   .getElementById('saveCategoryBtn')
+  //   .addEventListener('click', async () => {
+  //     let sendingData = {
+  //       newCategoryList: categoryList
+  //     }
+  //     await fetch(`${api}/user/${userId}/white-category`, {
+  //       method: 'PUT',
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify(sendingData)
+  //     })
+  //       .then(response => {
+  //         if (!response.ok) {
+  //           alert('Some error')
+  //         }
+  //         return response.json()
+  //       })
+  //       .then(data => {
+  //         if (data.isSucceed) {
+  //           alert('Category was successful added to white list')
+  //         } else {
+  //           alert('Try again')
+  //         }
+  //       })
+  //       .catch(error => {
+  //         console.error('Error:', error)
+  //         alert(error.message)
+  //       })
+  //   })
 
   async function getUserWhiteLists () {
-    if(userId!= undefined){
-
+    if (userId != undefined) {
       await fetch(`${api}/user/${userId}/white-lists`, {
         method: 'GET',
         headers: {
@@ -149,13 +152,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           return response.json()
         })
         .then(data => {
-            websiteList = data.websiteList
-            wordList = data.wordList
-            categoryList = data.categoryList
-            populateWordList(data.wordList)
-            populateWebsiteList(data.websiteList)
-            populateCategoryList(data.categoryList)
-        
+          websiteList = data.websiteList
+          wordList = data.wordList
+          categoryList = data.categoryList
+          populateWordList(data.wordList)
+          populateWebsiteList(data.websiteList)
+          populateCategoryList(data.categoryList)
         })
         .catch(error => {
           console.error('Error:', error)
@@ -168,20 +170,67 @@ document.addEventListener('DOMContentLoaded', async () => {
     list.innerHTML = ''
     items.forEach(item => {
       const li = document.createElement('li')
-      li.textContent = item
+      
+      // Create the remove button image
+      const removeBtnImg = document.createElement('img');
+      removeBtnImg.src = '../images/delete.png';
+      removeBtnImg.classList.add('removeLinkBtn'); // Adding class 'removeWordBtn'
+      removeBtnImg.alt = 'Remove'; // Optionally add alt text for accessibility
+      
+      // Append the remove button image to the list item
+      li.appendChild(removeBtnImg);
+      
+      // Add text content after the image
+      li.appendChild(document.createTextNode(item.link));
       list.appendChild(li)
     })
   }
 
-  function populateWordList (items) {
-    const list = document.getElementById('wordsList')
-    list.innerHTML = ''
+  function populateWordList(items) {
+    const list = document.getElementById('wordsList');
+    list.innerHTML = '';
     items.forEach(item => {
-      const li = document.createElement('li')
-      li.textContent = item
-      list.appendChild(li)
-    })
+      const li = document.createElement('li');
+      
+      // Create the remove button image
+      const removeBtnImg = document.createElement('img');
+      removeBtnImg.src = '../images/delete.png';
+      removeBtnImg.classList.add('removeWordBtn'); // Adding class 'removeWordBtn'
+      removeBtnImg.alt = 'Remove'; // Optionally add alt text for accessibility
+      
+      // Append the remove button image to the list item
+      li.appendChild(removeBtnImg);
+      
+      // Add text content after the image
+      li.appendChild(document.createTextNode(item.content));
+      
+      // Append the list item to the list
+      list.appendChild(li);
+    });
   }
+
+  function removeItemFromList(array, index,callback) {
+    array.splice(index, 1);
+    callback(array); // Update UI
+  }
+
+  // Add event listener for removing words
+  document.getElementById('wordsList').addEventListener('click', (event) => {
+    if (event.target.classList.contains('removeWordBtn')) {
+      const listItem = event.target.closest('li');
+      const index = Array.from(listItem.parentNode.children).indexOf(listItem);
+      removeItemFromList(wordList, index,populateWordList);
+    }
+  });
+
+  document.getElementById("linksList").addEventListener('click',(event)=>{
+    if (event.target.classList.contains('removeLinkBtn')) {
+      const listItem = event.target.closest('li');
+      const index = Array.from(listItem.parentNode.children).indexOf(listItem);
+      removeItemFromList(websiteList, index,populateWebsiteList);
+    }
+  })
+  
 
   function populateCategoryList (categories) {
     const list = document.getElementById('categoryItemsList')
@@ -193,11 +242,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     })
   }
 
-  async function getUserCredentials() {
+  async function getUserCredentials () {
     const result = await new Promise(resolve => {
-        chrome.storage.local.get(['token', 'userId'], resolve);
-    });
-    token = result.token;
-    userId = result.userId;
-}
+      chrome.storage.local.get(['token', 'userId'], resolve)
+    })
+    token = result.token
+    userId = result.userId
+  }
 })
