@@ -152,7 +152,6 @@ async function checkURL (baseUrl, { userId, token }) {
     })
     .then(async data => {
       if (!data.isExist) {
-        alert('This page is not in the database')
         await censureWebPage(userId, token)
       } else if (!data.isAllowed) {
         renderBlockPage(data.description)
