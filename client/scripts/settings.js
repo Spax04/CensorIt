@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         })
         .then(data => {
           if (data.isSucceed) {
-            alert('Link was successful added to white list')
           } else {
             alert('Try again')
           }
@@ -103,7 +102,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         })
         .then(data => {
           if (data.isSucceed) {
-            alert('Word was successful added to white list')
           } else {
             alert('Try again')
           }

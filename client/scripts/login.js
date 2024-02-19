@@ -46,12 +46,10 @@ document.addEventListener('DOMContentLoaded', function () {
           chrome.storage.local.set({ userId: userId })
           chrome.storage.local.set({ personalBlockPercentage: personalBlockPercentage })
 
-          alert(personalBlockPercentage)
           window.location.href = '../pages/config.html'
         })
         .catch(error => {
           console.error('Error:', error)
-          alert('Here' + error.message)
         })
     })
 })

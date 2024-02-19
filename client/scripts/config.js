@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error('Failed to update block level');
       }
 
-      alert('Block level updated successfully');
     } catch (error) {
       console.error(error);
       alert('Failed to update block level. Please try again.');
