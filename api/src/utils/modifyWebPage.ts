@@ -1,6 +1,6 @@
 import { getAllWords } from "../db/words";
 import { ObjectId } from 'bson';
-import { word, wordWithId } from "../models/word";
+import { wordWithId } from "../models/word";
 
 
 interface modifiedWebPageData {
@@ -10,11 +10,10 @@ interface modifiedWebPageData {
 
 
 const isNeedToCensured = (word: wordWithId, wordsWhitelist: ObjectId[], categoryWhiteList: ObjectId[]): boolean => {
-
-    if (!wordsWhitelist || wordsWhitelist.includes(word._id)) {
+    if (wordsWhitelist?.includes(word._id)) {
         return false;
     }
-    if (!categoryWhiteList || categoryWhiteList.includes(word.categoryId)) {
+    if (categoryWhiteList?.includes(word.categoryId)) {
         return false;
     }
     return true;
@@ -23,10 +22,8 @@ const isNeedToCensured = (word: wordWithId, wordsWhitelist: ObjectId[], category
 
 export default async function modifyWebPage(allPage: string, categoryWhiteList: ObjectId[], wordsWhitelist: ObjectId[]): Promise<modifiedWebPageData> {
     return new Promise<modifiedWebPageData>(async (resolve) => {
-        console.log('Modifying web page');
         const allWords = await getAllWords();
         let wordMap = new Map<string, number>();
-        console.log('Modifying web page');
         allWords.forEach((word) => {
             const categoryId = word.categoryId.toString();
             const reg = new RegExp(`\\b${word.content}\\b`, 'gi');

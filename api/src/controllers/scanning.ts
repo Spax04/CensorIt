@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import modifyWebPage from '../utils/modifyWebPage';
-import classifyCategories from '../utils/classifyCategories';
+import classifyToCategories from '../utils/classifyCategories';
 import { getUser } from '../db/users';
 import { ObjectId } from 'bson';
+import { getCategory } from '../db/categories';
 
 
 export async function scanLink(req: Request, res: Response): Promise<any> {
@@ -18,14 +19,18 @@ export async function scanLink(req: Request, res: Response): Promise<any> {
 
 
 
+
+function isNeedToBeBlocked(word: string, wordList: string[]): boolean {
+  return wordList.includes(word);
+}
+
+
 // Your scanText function
 const userChunksMap: Map<string, string[]> = new Map();
 
 export async function scanText(req: Request, res: Response): Promise<void> {
   try {
-    console.log(req.body)
     const { webPageChunk, userId, totalChunks, currentChunkIndex } = req.body;
-    console.log("user id", userId);
     const user = await getUser(userId as ObjectId);
     if (!userChunksMap.has(userId)) {
       userChunksMap.set(userId, []);
@@ -34,8 +39,6 @@ export async function scanText(req: Request, res: Response): Promise<void> {
     if (userChunksMap.get(userId)!.length === totalChunks) {
       const completeWebPage = userChunksMap.get(userId)!.join('');
       userChunksMap.delete(userId);
-      console.log('Complete web ');
-      console.log(user)
       if (user.categoryList === null) {
         user.categoryList = [];
       }
@@ -43,10 +46,19 @@ export async function scanText(req: Request, res: Response): Promise<void> {
         user.wordList = [];
       }
       const modifiedWebPage = modifyWebPage(completeWebPage, user.categoryList, user.wordList);
-      console.log('Complete web ');
       const amountOfWords = completeWebPage.split(' ').length;
       const { modifiedPage, wordsAmount } = await modifiedWebPage;
-      classifyCategories(wordsAmount, amountOfWords, req.headers.origin);
+      const websiteCategories = await classifyToCategories(wordsAmount, amountOfWords, req.headers.origin);
+      const websiteWithWorstCategory = websiteCategories.sort(website => website.blockPercentage - user.personalBlockPercentage)[websiteCategories.length - 1];
+      if (websiteWithWorstCategory.blockPercentage > user.personalBlockPercentage) {
+        let category = await getCategory(websiteWithWorstCategory.categoryId);
+        res.send({ 
+          isAllowed: false,
+          description: category.description
+        });
+        return;
+      }
+
       res.send({ modifiedPage });
     } else {
       res.send({ message: `Chunk ${currentChunkIndex + 1} of ${totalChunks} received.` });
