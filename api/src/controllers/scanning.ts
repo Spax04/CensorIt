@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import modifyWebPage from '../utils/modifyWebPage';
-import classifyCategory from '../utils/classifyCategory';
 import { userModel } from '../models/user';
 import { ObjectId } from 'bson';
 import { websiteModel } from '../models/website';
@@ -11,18 +10,11 @@ import { getCategory } from '../db/categories';
 
 
 export async function scanLink(req: Request, res: Response): Promise<any> {
-  // TODO: Implement a proper link scanner.
-
   const { userId, link } = req.body;
-
-
   const website = await websiteModel.findOne({ link: link });
-
 
   if (website) {
     const user = await userModel.findById(new ObjectId(userId));
-
-    console.log("User: " + user);
     if (
       user.personalBlockPercentage == 25 ||
       (user.personalBlockPercentage == 50 && website.blockPercentage < 75) ||
@@ -43,12 +35,6 @@ export async function scanLink(req: Request, res: Response): Promise<any> {
     return res.status(200).json({ isExist: false, isAllowed: true });
   }
 }
-
-
-function isNeedToBeBlocked(word: string, wordList: string[]): boolean {
-  return wordList.includes(word);
-}
-
 
 // Your scanText function
 const userChunksMap: Map<string, string[]> = new Map();
@@ -73,11 +59,13 @@ export async function scanText(req: Request, res: Response): Promise<void> {
       const modifiedWebPage = modifyWebPage(completeWebPage, user.categoryList, user.wordList);
       const amountOfWords = completeWebPage.split(' ').length;
       const { modifiedPage, wordsAmount } = await modifiedWebPage;
-
-      let x = classifyCategory(wordsAmount, amountOfWords);
       const websiteCategories = await classifyToCategories(wordsAmount, amountOfWords, req.headers.origin);
-      const websiteWithWorstCategory = websiteCategories.sort(website => website.blockPercentage - user.personalBlockPercentage)[websiteCategories.length - 1];
-      if (websiteWithWorstCategory.blockPercentage > user.personalBlockPercentage) {
+      if (websiteCategories.length === 0) {
+        res.send({ modifiedPage });
+        return;
+      }
+      const websiteWithWorstCategory = websiteCategories.sort((a,b) => b.blockPercentage - a.blockPercentage)[0];
+      if (websiteWithWorstCategory.blockPercentage > user.personalBlockPercentage + 25) {
         let category = await getCategory(websiteWithWorstCategory.categoryId);
         res.send({ 
           isAllowed: false,
@@ -85,8 +73,6 @@ export async function scanText(req: Request, res: Response): Promise<void> {
         });
         return;
       }
-
-
       res.send({ modifiedPage });
     } else {
       res.send({

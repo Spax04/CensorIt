@@ -54,7 +54,6 @@ export async function editWhiteWebsite(req: Request, res: Response): Promise<any
   const userId = req.params.id;
   const { newWebsiteList } = req.body;
 
-  console.log(newWebsiteList);
   if (!userId || !newWebsiteList || !Array.isArray(newWebsiteList)) {
     return res.status(400).json({ error: 'Invalid id or websites' });
   }
@@ -201,9 +200,6 @@ export async function getUserLists(req: Request, res: Response): Promise<any> {
       blockPercentage: website.blockPercentage,
     }));
 
-    console.log(wordData);
-    console.log(categoryData);
-    console.log(websiteData);
     return res.status(200).json({
       wordList: wordData,
       categoryList: categoryData,

@@ -5,6 +5,7 @@ import { websiteWithId } from "../models/website";
 async function classifyToCategories(dividedWords: Map<string, number>, amountOfWords: number, link: string) {
     let categoriesOfTheWebsite: Promise<websiteWithId>[] = [];
     for (let [key, value] of dividedWords) {
+        if (100 * value / amountOfWords < 75) continue;
         const websiteId = createWebsite({
             link: link,
             categoryId: new ObjectId(key),

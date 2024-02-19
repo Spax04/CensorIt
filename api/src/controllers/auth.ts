@@ -77,7 +77,6 @@ export async function isCorrectPassword(
     if (!isMatch) {
       return res.status(401).send(isMatch);
     }
-    console.log(isMatch);
     return res.send({ isCorrect: isMatch });
   } catch (error) {
     console.error('Error in checkPassword', error);
