@@ -37,7 +37,6 @@ export default async function modifyWebPage(allPage: string, categoryWhiteList: 
                 let oldCount = wordMap.get(categoryId);
                 wordMap.set(categoryId, oldCount! + count);
             }
-            // allPage = allPage.replace(new RegExp(reg, 'gi'), censured);
             
             if (isNeedToCensured(word, wordsWhitelist, categoryWhiteList)) {
                 allPage = allPage.replace(new RegExp(reg, 'gi'), censured);

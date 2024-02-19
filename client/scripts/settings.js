@@ -112,38 +112,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         })
     })
 
-  // document
-  //   .getElementById('saveCategoryBtn')
-  //   .addEventListener('click', async () => {
-  //     let sendingData = {
-  //       newCategoryList: categoryList
-  //     }
-  //     await fetch(`${api}/user/${userId}/white-category`, {
-  //       method: 'PUT',
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //         'Content-Type': 'application/json'
-  //       },
-  //       body: JSON.stringify(sendingData)
-  //     })
-  //       .then(response => {
-  //         if (!response.ok) {
-  //           alert('Some error')
-  //         }
-  //         return response.json()
-  //       })
-  //       .then(data => {
-  //         if (data.isSucceed) {
-  //           alert('Category was successful added to white list')
-  //         } else {
-  //           alert('Try again')
-  //         }
-  //       })
-  //       .catch(error => {
-  //         console.error('Error:', error)
-  //         alert(error.message)
-  //       })
-  //   })
 
   async function getUserWhiteLists () {
     if (userId != undefined) {

@@ -12,7 +12,6 @@ export async function editWhiteCategory(
   res: Response
 ): Promise<any> {
   const id = req.params.id;
-  console.log(id);
   const { newCategoryList } = req.body;
   if (!id || !newCategoryList) {
     return res.status(400).json({ error: 'Invalid id or categories' });
