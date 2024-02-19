@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import modifyWebPage from '../utils/modifyWebPage';
-import classifyCategory from '../utils/classifyCategory';
+import classifyCategories from '../utils/classifyCategories';
+import { getUser } from '../db/users';
+import { ObjectId } from 'bson';
 
 
 export async function scanLink(req: Request, res: Response): Promise<any> {
@@ -9,7 +11,7 @@ export async function scanLink(req: Request, res: Response): Promise<any> {
   const { userId, link } = req.body;
 
   //! TEST
-  console.log(req.body);
+  // console.log(req.body);
 
   return res.send({ message: 'Scanning Link' });
 }
@@ -21,7 +23,10 @@ const userChunksMap: Map<string, string[]> = new Map();
 
 export async function scanText(req: Request, res: Response): Promise<void> {
   try {
+    console.log(req.body)
     const { webPageChunk, userId, totalChunks, currentChunkIndex } = req.body;
+    console.log("user id", userId);
+    const user = await getUser(userId as ObjectId);
     if (!userChunksMap.has(userId)) {
       userChunksMap.set(userId, []);
     }
@@ -29,13 +34,19 @@ export async function scanText(req: Request, res: Response): Promise<void> {
     if (userChunksMap.get(userId)!.length === totalChunks) {
       const completeWebPage = userChunksMap.get(userId)!.join('');
       userChunksMap.delete(userId);
-      const modifiedWebPage = modifyWebPage(completeWebPage);
+      console.log('Complete web ');
+      console.log(user)
+      if (user.categoryList === null) {
+        user.categoryList = [];
+      }
+      if (!user.wordList === null) {
+        user.wordList = [];
+      }
+      const modifiedWebPage = modifyWebPage(completeWebPage, user.categoryList, user.wordList);
+      console.log('Complete web ');
       const amountOfWords = completeWebPage.split(' ').length;
       const { modifiedPage, wordsAmount } = await modifiedWebPage;
-
-      let x = classifyCategory(wordsAmount, amountOfWords)
-
-
+      classifyCategories(wordsAmount, amountOfWords, req.headers.origin);
       res.send({ modifiedPage });
     } else {
       res.send({ message: `Chunk ${currentChunkIndex + 1} of ${totalChunks} received.` });
