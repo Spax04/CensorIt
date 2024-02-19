@@ -10,15 +10,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await getUserWhiteLists()
 
+  function validateLink(link) {
+    // Regular expression to check if the link ends with a slash '/'
+    const regex = /\/$/;
+    return !regex.test(link); // Returns true if the link does not end with '/'
+  }
+
   document.getElementById('addLinkBtn').addEventListener('click', () => {
-    let linkInput = document.getElementById('linkInput')
-    let link = { link: linkInput.value }
-    websiteList.push(link)
+    let linkInput = document.getElementById('linkInput');
+    let link = linkInput.value.trim(); // Trim whitespace from the input
+    if (link && validateLink(link)) { // Check if link is not empty and passes validation
+      let link = { link: linkInput.value };
+      websiteList.push(link);
 
-    linkInput.value = ''
+      linkInput.value = '';
 
-    populateWebsiteList(websiteList)
-  })
+      populateWebsiteList(websiteList);
+    } else {
+      alert('Please enter a valid link without "/" at the end.');
+    }
+  });
 
   document.getElementById('addWordsBtn').addEventListener('click', () => {
     let word = document.getElementById('wordInput')

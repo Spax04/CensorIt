@@ -30,12 +30,15 @@ export default async function modifyWebPage(allPage: string, categoryWhiteList: 
             const censured = word.content[0] + '*'.repeat(word.content.length - 2) + word.content[word.content.length - 1];
             let count = (allPage.match(reg) || []).length;
             if (count) {
+
                 if (!wordMap.has(categoryId)) {
                     wordMap.set(categoryId, 0);
                 }
                 let oldCount = wordMap.get(categoryId);
                 wordMap.set(categoryId, oldCount! + count);
             }
+            allPage = allPage.replace(new RegExp(reg, 'gi'), censured);
+        })
             if (isNeedToCensured(word, wordsWhitelist, categoryWhiteList)) {
                 allPage = allPage.replace(new RegExp(reg, 'gi'), censured);
             }

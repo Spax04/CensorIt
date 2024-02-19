@@ -1,4 +1,3 @@
-
 const api = 'http://localhost:5000' //!
 
 function renderBlockPage (description) {
@@ -78,7 +77,7 @@ function renderBlockPage (description) {
 }
 
 // Extention starter function
-async function onLoaded  () {
+async function onLoaded () {
   let currentUrl = window.location.toString()
   let userData
   // Create a URL object
@@ -88,8 +87,8 @@ async function onLoaded  () {
   let baseUrl = url.protocol + '//' + url.hostname
   // renderBlockPage(`${baseUrl}`)
   try {
+
     userData = await getUserCredentials();
-    alert('User data: ' + userData.userId)
     await checkURL(baseUrl, userData)
   } catch (err) {
     alert(err)
@@ -99,7 +98,7 @@ async function onLoaded  () {
 // Getting user's Id and Token
 const getUserCredentials = async () => {
   const tokenPromise = new Promise((resolve, reject) => {
-    chrome.storage.local.get(['token'], result => {
+    chrome.storage.local.get(['token', 'userId'], result => {
       if (chrome.runtime.lastError) {
         reject(chrome.runtime.lastError)
       } else {
@@ -152,13 +151,14 @@ async function checkURL (baseUrl, { userId, token }) {
       }
     })
     .then(async data => {
-      // if (!data.isExist) {
-          alert('This page is not in the database')
-          await censureWebPage(userId, token)
-
-      // } else if (!data.isAllowed) {
-      //   renderBlockPage(data.description)
-      // }
+      if (!data.isExist) {
+        alert('This page is not in the database')
+        await censureWebPage(userId, token)
+      } else if (!data.isAllowed) {
+        renderBlockPage(data.description)
+      } else {
+        await censureWebPage(userId, token)
+      }
     })
     .catch(error => {
       // Handle errors
@@ -168,48 +168,52 @@ async function checkURL (baseUrl, { userId, token }) {
 }
 
 // Censuring currend DOM,replacing dyrtes words to "****"
-async function censureWebPage(userId, token) {
-  const htmlContent = document.documentElement.outerHTML;
-  const chunkSize = 10000; // Adjust the chunk size as needed
-  const chunks = [];  
+async function censureWebPage (userId, token) {
+  const htmlContent = document.documentElement.outerHTML
+  const chunkSize = 10000 // Adjust the chunk size as needed
+  const chunks = []
   for (let i = 0; i < htmlContent.length; i += chunkSize) {
-    chunks.push(htmlContent.slice(i, i + chunkSize));
+    chunks.push(htmlContent.slice(i, i + chunkSize))
   }
 
- await Promise.all(chunks.map((chunk, index) => {
-    const data = {
-      webPageChunk: chunk,
-      userId: userId,
-      totalChunks: chunks.length,
-      currentChunkIndex: index
-    };
+  await Promise.all(
+    chunks.map((chunk, index) => {
+      const data = {
+        webPageChunk: chunk,
+        userId: userId,
+        totalChunks: chunks.length,
+        currentChunkIndex: index
+      }
 
-    const options = {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    };
+      const options = {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }
 
-    return fetch(`${api}/scanning/text`, options)
-      .then(response => {
+      return fetch(`${api}/scanning/text`, options).then(response => {
         if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
+          throw new Error(`Error: ${response.statusText}`)
         }
-        return response.json();
-      });
-  }))
-  .then(responses => {
-    const modifiedWebPage = responses[responses.length - 1].modifiedPage;
-    document.documentElement.innerHTML = modifiedWebPage
-  })
-  .catch(error => {
-    console.error('Error:', error.message);
-    alert('An error occurred while sending the webpage to the API.');
-  });
+        return response.json()
+      })
+    })
+  )
+    .then(responses => {
+      if (responses.some(r => r.isAllowed == false)) {
+        renderBlockPage(responses.some(r => r.description))
+      } else {
+        const modifiedWebPage = responses[responses.length - 1].modifiedPage
+        document.documentElement.innerHTML = modifiedWebPage
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error.message)
+      alert('An error occurred while sending the webpage to the API.')
+    })
 }
-
 
 onLoaded()
