@@ -208,6 +208,28 @@ document.addEventListener('DOMContentLoaded', async () => {
       list.appendChild(li);
     });
   }
+
+  function removeItemFromList(array, index,callback) {
+    array.splice(index, 1);
+    callback(array); // Update UI
+  }
+
+  // Add event listener for removing words
+  document.getElementById('wordsList').addEventListener('click', (event) => {
+    if (event.target.classList.contains('removeWordBtn')) {
+      const listItem = event.target.closest('li');
+      const index = Array.from(listItem.parentNode.children).indexOf(listItem);
+      removeItemFromList(wordList, index,populateWordList);
+    }
+  });
+
+  document.getElementById("linksList").addEventListener('click',(event)=>{
+    if (event.target.classList.contains('removeLinkBtn')) {
+      const listItem = event.target.closest('li');
+      const index = Array.from(listItem.parentNode.children).indexOf(listItem);
+      removeItemFromList(websiteList, index,populateWebsiteList);
+    }
+  })
   
 
   function populateCategoryList (categories) {

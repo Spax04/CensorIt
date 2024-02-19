@@ -50,31 +50,37 @@ async function updateUserCategoryList(
   );
 }
 
-export async function editWhiteWebsite(
-  req: Request,
-  res: Response
-): Promise<any> {
-  const id = req.params.id;
+export async function editWhiteWebsite(req: Request, res: Response): Promise<any> {
+  const userId = req.params.id;
   const { newWebsiteList } = req.body;
 
   console.log(newWebsiteList);
-  if (!id || !newWebsiteList) {
+  if (!userId || !newWebsiteList || !Array.isArray(newWebsiteList)) {
     return res.status(400).json({ error: 'Invalid id or websites' });
   }
-  try {
-    // Iterate through each word in the newWordList
-    for (const linkInList of newWebsiteList) {
-      // Search for the word in the database
-      const link = await websiteModel.findOne({ link: linkInList.link });
 
-      if (link) {
-        // If the word exists, add its ObjectId to the user's wordList
-        await updateUserWebsiteList(id, link._id);
+  try {
+    // Clear the user's websiteList before updating
+    await userModel.updateOne({ _id: userId }, { $set: { websiteList: [] } });
+
+    // Iterate through each website in the newWebsiteList
+    for (const websiteInList of newWebsiteList) {
+      // Search for the website in the database
+      const website = await websiteModel.findOne({ link: websiteInList.link });
+
+      if (website) {
+        // If the website exists, add its ObjectId to the user's websiteList
+        await userModel.updateOne(
+          { _id: userId },
+          { $addToSet: { websiteList: website._id } } // Use $addToSet to avoid duplicate entries
+        );
       } else {
-        console.log(`Website not found: ${linkInList.link}`);
-        //!!!!! Remove this part,in use inly for adding new websites to db
+        console.log(`Website not found: ${websiteInList.link}`);
+        // If the website doesn't exist, you may choose to handle this case as needed.
+        // For example, you could create a new website entry in the database.
+              //!!!!! Remove this part,in use inly for adding new websites to db
         const newWebSite = new websiteModel({
-          link: linkInList.link,
+          link: websiteInList.link,
           blockPercentage: 100,
           categoryId: new ObjectId('65cdcc2316ad1f411aa12a4d'),
         });
@@ -92,6 +98,8 @@ export async function editWhiteWebsite(
   }
 }
 
+
+
 async function updateUserWebsiteList(
   userId: string,
   websiteId: ObjectId
@@ -103,13 +111,17 @@ async function updateUserWebsiteList(
 }
 
 export async function editWhiteWord(req: Request, res: Response): Promise<any> {
-  const id = req.params.id;
+  const userId = req.params.id;
   const { newWordList } = req.body;
-  if (!id || !newWordList) {
+  
+  if (!userId || !newWordList || !Array.isArray(newWordList)) {
     return res.status(400).json({ error: 'Invalid id or words' });
   }
 
   try {
+    // Clear the user's wordList before updating
+    await userModel.updateOne({ _id: userId }, { $set: { wordList: [] } });
+
     // Iterate through each word in the newWordList
     for (const wordInList of newWordList) {
       // Search for the word in the database
@@ -117,9 +129,12 @@ export async function editWhiteWord(req: Request, res: Response): Promise<any> {
 
       if (word) {
         // If the word exists, add its ObjectId to the user's wordList
-        await updateUserWordList(id, word._id);
+        await userModel.updateOne(
+          { _id: userId },
+          { $addToSet: { wordList: word._id } } // Use $addToSet to avoid duplicate entries
+        );
       } else {
-        console.log(`Word not found: ${word}`);
+        console.log(`Word not found: ${wordInList.content}`);
       }
     }
 
@@ -130,16 +145,7 @@ export async function editWhiteWord(req: Request, res: Response): Promise<any> {
   }
 }
 
-async function updateUserWordList(
-  userId: string,
-  wordId: ObjectId
-): Promise<void> {
-  // Update the user's wordList with the new wordId
-  await userModel.updateOne(
-    { _id: userId },
-    { $addToSet: { wordList: wordId } } // Use $addToSet to avoid duplicate entries
-  );
-}
+
 
 export async function editPersonalBlockPercentage(
   req: Request,
