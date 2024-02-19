@@ -21,8 +21,13 @@ app.use("/user", userRouter);
 app.use("/auth", authRouter);
 
 
-app.use((err,req,res,next)=>{
-    res.status(500).send({message:err.message})
+app.get('/', (req, res) => {
+  res.send('app is alive!')
+})
+
+
+app.get('*', (req, res) => {
+  res.send('error 404: page not found!')
 })
 
 mongoose
@@ -31,7 +36,6 @@ mongoose
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`)
     })
-    console.log('Connected to MongoDB')
   })
   .catch(error => {
     console.log('Failed to connect to MongoDB ' + error.message)

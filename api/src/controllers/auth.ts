@@ -23,6 +23,7 @@ export async function signUp(req: Request, res: Response): Promise<any> {
     res.send({
       userId: user._id,
       email: user.email,
+      personalBlockPercentage: user.personalBlockPercentage,
       token: generateToken(user),
     });
   } catch (err) {
@@ -42,6 +43,7 @@ export async function signIn(req: Request, res: Response): Promise<any> {
         res.send({
           userId: user._id,
           email: user.email,
+          personalBlockPercentage: user.personalBlockPercentage,
           token: generateToken(user),
         });
         return;
@@ -63,7 +65,6 @@ export async function isCorrectPassword(
   try {
     const { userId, password } = req.body;
 
-    console.log(req.body);
 
     // TODO: add _id when generating token
     const user = await userModel.findById(userId);
@@ -76,7 +77,6 @@ export async function isCorrectPassword(
     if (!isMatch) {
       return res.status(401).send(isMatch);
     }
-    console.log(isMatch);
     return res.send({ isCorrect: isMatch });
   } catch (error) {
     console.error('Error in checkPassword', error);
