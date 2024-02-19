@@ -75,18 +75,7 @@ export async function editWhiteWebsite(req: Request, res: Response): Promise<any
         );
       } else {
         console.log(`Website not found: ${websiteInList.link}`);
-        // If the website doesn't exist, you may choose to handle this case as needed.
-        // For example, you could create a new website entry in the database.
-              //!!!!! Remove this part,in use inly for adding new websites to db
-        const newWebSite = new websiteModel({
-          link: websiteInList.link,
-          blockPercentage: 100,
-          categoryId: new ObjectId('65cdcc2316ad1f411aa12a4d'),
-        });
 
-        await createWebsite(newWebSite);
-
-        //!!!!
       }
     }
 
