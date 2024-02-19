@@ -11,7 +11,6 @@ import { getCategory } from '../db/categories';
 export async function scanLink(req: Request, res: Response): Promise<any> {
   const { userId, link } = req.body;
   const website = await websiteModel.findOne({ link: link });
-  console.log(website);
 
   if (website) {
     const user = await userModel.findById(new ObjectId(userId));
@@ -60,7 +59,6 @@ export async function scanText(req: Request, res: Response): Promise<void> {
       if (!user.wordList === null) {
         user.wordList = [];
       }
-      console.log('newHERE');
       const modifiedWebPage = modifyWebPage(
         completeWebPage,
         user.categoryList,
@@ -68,7 +66,6 @@ export async function scanText(req: Request, res: Response): Promise<void> {
       );
       const amountOfWords = completeWebPage.split(' ').length;
       const { modifiedPage, wordsAmount } = await modifiedWebPage;
-      console.log(req.headers.origin);
       const webSite = await websiteModel.findOne({link:req.headers.origin})
       
       if(!webSite){
@@ -146,17 +143,7 @@ export async function scanText(req: Request, res: Response): Promise<void> {
             console.log('object');
         }
       }
-      // if (
-      //   websiteWithWorstCategory.blockPercentage >
-      //   user.personalBlockPercentage + 25
-      // ) {
-      //   res.send({
-      //     isAllowed: false,
-      //     description: category.description,
-      //   });
-      //   return;
-      // }
-      // res.send({ modifiedPage });
+      
     } else {
       res.send({
         message: `Chunk ${currentChunkIndex + 1} of ${totalChunks} received.`,

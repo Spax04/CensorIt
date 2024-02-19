@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "CensureIt",
-  "version": "1.0",
-  "description": "test",
+  "name": "CensorIt",
+  "version": "2.5",
+  "description": "CensorIt is your go-to solution for maintaining a safe browsing experience by automatically censoring explicit words and blocking access to websites containing pornography content.",
   "permissions": ["activeTab","tabs","storage"],
   "action": {
     "default_popup": "./pages/login.html"
