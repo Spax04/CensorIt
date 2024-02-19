@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     personalBlockPercentage = result.personalBlockPercentage
     setBlockLevelOption(personalBlockPercentage)
   })
-
+  
   const setBlockLevelOption = (personalBlockProsent) => {
     const blockLevelSelect = document.getElementById('blockLevel');
     blockLevelSelect.value = personalBlockProsent.toString();
@@ -56,6 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok) {
         throw new Error('Failed to update block level');
       }
+      chrome.storage.local.set({ personalBlockPercentage: newPercentage })
+      setBlockLevelOption(newPercentage)
 
     } catch (error) {
       console.error(error);
