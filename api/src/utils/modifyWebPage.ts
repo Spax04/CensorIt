@@ -1,8 +1,6 @@
-// import { Types } from "mongoose";
 import { getAllWords } from "../db/words";
-import { word } from "../models/word";
 import { ObjectId } from 'bson';
-
+import { wordWithId } from "../models/word";
 
 
 interface modifiedWebPageData {
@@ -11,7 +9,18 @@ interface modifiedWebPageData {
 }
 
 
-export default async function modifyWebPage(allPage: string): Promise<modifiedWebPageData> {
+const isNeedToCensured = (word: wordWithId, wordsWhitelist: ObjectId[], categoryWhiteList: ObjectId[]): boolean => {
+    if (wordsWhitelist?.includes(word._id)) {
+        return false;
+    }
+    if (categoryWhiteList?.includes(word.categoryId)) {
+        return false;
+    }
+    return true;
+}
+
+
+export default async function modifyWebPage(allPage: string, categoryWhiteList: ObjectId[], wordsWhitelist: ObjectId[]): Promise<modifiedWebPageData> {
     return new Promise<modifiedWebPageData>(async (resolve) => {
         const allWords = await getAllWords();
         let wordMap = new Map<string, number>();
@@ -21,18 +30,16 @@ export default async function modifyWebPage(allPage: string): Promise<modifiedWe
             const censured = word.content[0] + '*'.repeat(word.content.length - 2) + word.content[word.content.length - 1];
             let count = (allPage.match(reg) || []).length;
             if (count) {
-                console.log(`Word: ${word.content}, Count: ${count}`);
-
                 if (!wordMap.has(categoryId)) {
                     wordMap.set(categoryId, 0);
                 }
                 let oldCount = wordMap.get(categoryId);
                 wordMap.set(categoryId, oldCount! + count);
             }
-            allPage = allPage.replace(new RegExp(reg, 'gi'), censured);
-            console.table(wordMap);
+            if (isNeedToCensured(word, wordsWhitelist, categoryWhiteList)) {
+                allPage = allPage.replace(new RegExp(reg, 'gi'), censured);
+            }
         })
-        console.table(wordMap);
         resolve({
             modifiedPage: allPage,
             wordsAmount: wordMap

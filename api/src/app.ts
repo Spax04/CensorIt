@@ -21,8 +21,13 @@ app.use("/user", userRouter);
 app.use("/auth", authRouter);
 
 
-app.use((err,req,res,next)=>{
-    res.status(500).send({message:err.message})
+app.get('/', (req, res) => {
+  res.send('app is alive!')
+})
+
+
+app.get('*', (req, res) => {
+  res.send('error 404: page not found!')
 })
 
 mongoose
