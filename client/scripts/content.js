@@ -87,7 +87,8 @@ async function onLoaded () {
   let baseUrl = url.protocol + '//' + url.hostname
   // renderBlockPage(`${baseUrl}`)
   try {
-    userData = await getUserCredentials()
+
+    userData = await getUserCredentials();
     await checkURL(baseUrl, userData)
   } catch (err) {
     alert(err)

@@ -65,7 +65,6 @@ export async function isCorrectPassword(
   try {
     const { userId, password } = req.body;
 
-    console.log(req.body);
 
     // TODO: add _id when generating token
     const user = await userModel.findById(userId);
