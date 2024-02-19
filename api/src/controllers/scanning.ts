@@ -8,13 +8,17 @@ import classifyToCategories from '../utils/classifyCategories';
 import { getUser } from '../db/users';
 import { getCategory } from '../db/categories';
 
-
 export async function scanLink(req: Request, res: Response): Promise<any> {
   const { userId, link } = req.body;
   const website = await websiteModel.findOne({ link: link });
+  console.log(website);
 
   if (website) {
     const user = await userModel.findById(new ObjectId(userId));
+    if(website.blockPercentage === 0){
+      return res.status(200).json({ isExist: true, isAllowed: true });
+
+    }
     if (
       user.personalBlockPercentage == 25 ||
       (user.personalBlockPercentage == 50 && website.blockPercentage < 75) ||
@@ -56,24 +60,103 @@ export async function scanText(req: Request, res: Response): Promise<void> {
       if (!user.wordList === null) {
         user.wordList = [];
       }
-      const modifiedWebPage = modifyWebPage(completeWebPage, user.categoryList, user.wordList);
+      console.log('newHERE');
+      const modifiedWebPage = modifyWebPage(
+        completeWebPage,
+        user.categoryList,
+        user.wordList
+      );
       const amountOfWords = completeWebPage.split(' ').length;
       const { modifiedPage, wordsAmount } = await modifiedWebPage;
-      const websiteCategories = await classifyToCategories(wordsAmount, amountOfWords, req.headers.origin);
-      if (websiteCategories.length === 0) {
-        res.send({ modifiedPage });
-        return;
-      }
-      const websiteWithWorstCategory = websiteCategories.sort((a,b) => b.blockPercentage - a.blockPercentage)[0];
-      if (websiteWithWorstCategory.blockPercentage > user.personalBlockPercentage + 25) {
+      console.log(req.headers.origin);
+      const webSite = await websiteModel.findOne({link:req.headers.origin})
+      
+      if(!webSite){
+
+        const websiteCategories = await classifyToCategories(
+          wordsAmount,
+          amountOfWords,
+          req.headers.origin
+        );
+        if (websiteCategories.length === 0) {
+          res.send({ modifiedPage });
+          return;
+        }
+        const websiteWithWorstCategory = websiteCategories.sort(
+          (a, b) => b.blockPercentage - a.blockPercentage
+        )[0];
         let category = await getCategory(websiteWithWorstCategory.categoryId);
-        res.send({ 
-          isAllowed: false,
-          description: category.description
-        });
-        return;
+  
+        switch (user.personalBlockPercentage) {
+          case 25:
+            res.send({ modifiedPage });
+            break;
+          case 50:
+            if (websiteWithWorstCategory.blockPercentage < 75) {
+              res.send({ modifiedPage });
+            } else {
+              res.send({
+                isAllowed: false,
+                description: category.description,
+              });
+            }
+            break;
+          case 75:
+            if (websiteWithWorstCategory.blockPercentage < 25) {
+              res.send({ modifiedPage });
+            } else {
+              res.send({
+                isAllowed: false,
+                description: category.description,
+              });
+            }
+            break;
+          default:
+            console.log('object');
+        }
+      }else{
+
+        let category = await getCategory(webSite.categoryId);
+
+        switch (user.personalBlockPercentage) {
+          case 25:
+            res.send({ modifiedPage });
+            break;
+          case 50:
+            if (webSite.blockPercentage < 75) {
+              res.send({ modifiedPage });
+            } else {
+              res.send({
+                isAllowed: false,
+                description: category.description,
+              });
+            }
+            break;
+          case 75:
+            if (webSite.blockPercentage < 25) {
+              res.send({ modifiedPage });
+            } else {
+              res.send({
+                isAllowed: false,
+                description: category.description,
+              });
+            }
+            break;
+          default:
+            console.log('object');
+        }
       }
-      res.send({ modifiedPage });
+      // if (
+      //   websiteWithWorstCategory.blockPercentage >
+      //   user.personalBlockPercentage + 25
+      // ) {
+      //   res.send({
+      //     isAllowed: false,
+      //     description: category.description,
+      //   });
+      //   return;
+      // }
+      // res.send({ modifiedPage });
     } else {
       res.send({
         message: `Chunk ${currentChunkIndex + 1} of ${totalChunks} received.`,
