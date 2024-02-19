@@ -21,7 +21,7 @@ export default async function modifyWebPage(allPage: string): Promise<modifiedWe
             const censured = word.content[0] + '*'.repeat(word.content.length - 2) + word.content[word.content.length - 1];
             let count = (allPage.match(reg) || []).length;
             if (count) {
-                console.log(`Word: ${word.content}, Count: ${count}`);
+               // console.log(`Word: ${word.content}, Count: ${count}`);
 
                 if (!wordMap.has(categoryId)) {
                     wordMap.set(categoryId, 0);
@@ -30,9 +30,9 @@ export default async function modifyWebPage(allPage: string): Promise<modifiedWe
                 wordMap.set(categoryId, oldCount! + count);
             }
             allPage = allPage.replace(new RegExp(reg, 'gi'), censured);
-            console.table(wordMap);
+           // console.table(wordMap);
         })
-        console.table(wordMap);
+       // console.table(wordMap);
         resolve({
             modifiedPage: allPage,
             wordsAmount: wordMap
